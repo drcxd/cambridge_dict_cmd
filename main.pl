@@ -6,6 +6,7 @@ use 5.010;
 
 my $URL = "https://dictionary.cambridge.org/dictionary/english/";
 my $PATTERN = "<b class=\\\"def\\\">.*</b>";
+my $TEMP_FILE = "DICT_TEMP";
 
 # fist a single pass program
 # query(shift @ARGV);
@@ -23,9 +24,12 @@ while (my $word = <STDIN>)
 sub query {
     my $word = shift @_;
     my $request_url = "${URL}${word}";
-    my $cmd = "curl -s ${request_url} | grep \"${PATTERN}\"";
-    # say "cmd is $cmd";
-    my @result = `$cmd`;
+    # say "downloading...";    
+    `wget -q $request_url -O $TEMP_FILE`;    
+    # say "greping...";
+    my $grepcmd = "grep \"<b class=\\\"def\\\">.*</b>\" $TEMP_FILE";
+    my @result = `$grepcmd`; # it's weird that the commad must run in a variable instead of unfold directly inside the ``
+    
     for (@result) {
         my $line = $_;
         $line =~ s#\A.*<b class="def">##;

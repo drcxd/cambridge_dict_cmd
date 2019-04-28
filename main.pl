@@ -27,8 +27,14 @@ sub query {
     # say "downloading...";    
     `wget -q $request_url -O $TEMP_FILE`;    
     # say "greping...";
-    my $grepcmd = "grep \"<b class=\\\"def\\\">.*</b>\" $TEMP_FILE";
+    my $grepcmd = "grep \"<b class=\\\"def\\\">.*</b>\" $TEMP_FILE";    
     my @result = `$grepcmd`; # it's weird that the commad must run in a variable instead of unfold directly inside the ``
+    my $grep_name_cmd = "grep \"og:url\" $TEMP_FILE";
+    my $name = `$grep_name_cmd`;
+    if ($name =~ m#english/(.*?)"#) {
+        $name = $1;
+        say $name;
+    }
     
     for (@result) {
         my $line = $_;
@@ -41,6 +47,7 @@ sub query {
             $line =~ s#<a.*?${link}</a>#${link}#;
             # print $line;
         }
+        print "# ";
         print $line;
     }
 }
